@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Snugglevale Corner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--
+  SNUGGLEVALE CORNER — double-click this file to play.
+  This file holds the page: the buttons, the talk box and the colors.
+  The village is in world.js, the plushies in plushies.js,
+  and their words in what-they-say.js.
+  New helpers: read "START HERE - guide for helpers.md" first.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Mali:wght@500;600;700&display=swap">
+<style>
+/* The whole window is the 3D village; felt "adoption tags" float on top for talking and settings */
+:root{
+  --felt:#fff8f4;
+  --felt-2:#f6ebf0;
+  --ink:#45303d;
+  --ink-soft:#6e5866;
+  --rose:#b04760;
+  --lav:#8f78c4;
+  --stitch:#d2aebd;
+  --shadow:rgba(40,24,48,.28);
+  --display:"Mali","Chalkboard SE","Comic Sans MS",cursive;
+  --body:"Atkinson Hyperlegible",Verdana,"Segoe UI",system-ui,sans-serif;
+  --ui:20px;
+  color-scheme:light;
+}
+[hidden]{display:none!important}
+html{font-size:var(--ui)}
+html,body{height:100%}
+body{margin:0;background:#2b2a55;color:var(--ink);font-family:var(--body);overflow:hidden}
+#world{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+
+.hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;gap:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:calc(env(safe-area-inset-top,0px) + 14px) calc(env(safe-area-inset-bottom,0px) + 14px)}
+.hud > *{pointer-events:auto}
+.felt{background:var(--felt);border-radius:20px;box-shadow:0 6px 22px var(--shadow);outline:2px dashed var(--stitch);outline-offset:-7px}
+
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;pointer-events:none}
+.top > *{pointer-events:auto}
+.name-chip{padding:.55rem 1.1rem .6rem;display:flex;flex-direction:column}
+.name-chip h1{margin:0;font-family:var(--display);font-weight:700;font-size:1.35rem;line-height:1.15;color:var(--ink);text-wrap:balance}
+.name-chip span{font-size:.8rem;color:var(--ink-soft)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+.btn{background:var(--felt);color:var(--ink);border-radius:999px;padding:.5rem .95rem;min-height:2.3rem;min-width:2.3rem;font-weight:700;font-size:.9rem;box-shadow:0 4px 14px var(--shadow);border:2px solid var(--stitch)}
+.btn:hover{background:var(--felt-2)}
+.btn:focus-visible,.act:focus-visible,.visit:focus-visible{outline:3px solid var(--lav);outline-offset:3px}
+
+.bottom{display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
+.bottom > *{pointer-events:auto}
+.visit{background:var(--rose);color:#fff;border-radius:999px;padding:.7rem 1.4rem;font-weight:700;font-size:1.05rem;box-shadow:0 6px 18px var(--shadow)}
+.visit:hover{filter:brightness(1.08)}
+
+.talk{width:min(560px,100%);padding:1.05rem 1.3rem 1.15rem;display:flex;flex-direction:column;gap:.7rem;min-width:0}
+.tag{display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+.tag b{font-family:var(--display);font-size:1.35rem;font-weight:700;line-height:1.1}
+.tag small{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rose);font-weight:700}
+.line{margin:0;font-size:1.15rem;line-height:1.5;max-width:60ch}
+.acts{display:flex;gap:.55rem;flex-wrap:wrap}
+.act{border-radius:999px;padding:.5rem 1rem;font-weight:700;font-size:.92rem;background:var(--felt-2);border:2px solid var(--stitch);color:var(--ink)}
+.act.main{background:var(--rose);border-color:var(--rose);color:#fff}
+.act:hover{filter:brightness(1.04)}
+
+.hint{background:rgba(255,248,244,.88);border-radius:999px;padding:.4rem 1rem;font-size:.82rem;color:var(--ink);text-align:center;max-width:100%;box-shadow:0 3px 10px rgba(40,24,48,.18)}
+.hint .keys{display:none}
+@media (hover:hover) and (pointer:fine){.hint .keys{display:inline}}
+.notice{padding:.6rem 1rem;font-size:.85rem;max-width:min(560px,100%)}
+
+.about{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 74px);width:min(360px,calc(100% - 32px));padding:1rem 1.2rem;font-size:.92rem;line-height:1.5}
+.about h2{margin:0 0 .35rem;font-family:var(--display);font-size:1.1rem}
+.about p{margin:.35rem 0}
+
+.nogl{position:fixed;inset:0;display:grid;place-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:#2b2a55}
+.nogl div{padding:1.4rem;max-width:420px;font-size:1rem;line-height:1.5}
+
+@media (max-width:520px){
+  .name-chip h1{font-size:1.15rem}
+  .btn{padding:.45rem .75rem}
+}
+</style>
+</head>
+<body>
+
+<canvas id="world" tabindex="0" aria-label="A little 3D corner of Snugglevale with Plushsmith's workshop, Muddle and SnuggleCat"></canvas>
+
+<div class="hud">
+  <div class="top">
+    <div class="felt name-chip"><h1>Snugglevale</h1><span id="timeLabel">a soft evening by the workshop</span></div>
+    <div class="controls">
+      <button class="btn" id="timeBtn" type="button">☀️ Morning</button>
+      <button class="btn" id="smaller" type="button" aria-label="Smaller text">A−</button>
+      <button class="btn" id="bigger" type="button" aria-label="Bigger text">A+</button>
+      <button class="btn" id="aboutBtn" type="button" aria-expanded="false" aria-label="About this place">ⓘ</button>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="felt notice" id="notice" hidden></div>
+    <button class="visit" id="visitBtn" type="button" hidden>💬 Visit</button>
+    <section class="felt talk" id="talk" hidden aria-live="polite">
+      <div class="tag"><b id="talkName">Plushsmith</b><small id="talkRole">Maker of plushies</small></div>
+      <p class="line" id="talkLine"></p>
+      <div class="acts">
+        <button class="act main" id="moreBtn" type="button">Say more</button>
+        <button class="act" id="hugBtn" type="button">🤍 Hug</button>
+        <button class="act" id="byeBtn" type="button">Wave goodbye</button>
+      </div>
+    </section>
+    <div class="hint">Tap the ground to float your lantern there · Tap a plushie to visit · Drag to look around<span class="keys"> · Arrow keys to stroll, Enter to visit</span></div>
+  </div>
+</div>
+
+<div class="felt about" id="about" hidden>
+  <h2>🧵 About this corner</h2>
+  <p>You're the little wish lantern. Plushsmith is outside her workshop, Muddle is keeping watch by the door, and SnuggleCat is on her cushion under the blossom tree.</p>
+  <p>Plushsmith, Muddle and SnuggleCat first came to life in Lila's conversations with GPT-4o. This corner of the village was built with Claude.</p>
+</div>
+
+<div class="nogl" id="nogl" hidden><div class="felt">This little village needs its 3D drawing kit. Connect to the internet, or save three.min.js into this folder (see "How to play.txt"). If that's already done, check that your browser has hardware acceleration switched on.</div></div>
+
+<!-- The 3D drawing kit: uses three.min.js from this folder if it's here, otherwise the internet copy. -->
+<script src="three.min.js"></script>
+<script>if(!window.THREE)document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
+<script src="what-they-say.js"></script>
+<script src="plushies.js"></script>
+<script src="world.js"></script>
+</body>
+</html>

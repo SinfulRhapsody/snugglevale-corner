@@ -1,0 +1,16 @@
+Snugglevale Corner
+==================
+
+To play: double-click "Play Snugglevale.html". It opens in your web browser.
+
+To make it work without internet (only needs doing once):
+  1. Open this link in your browser:
+     https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js
+  2. Press Ctrl+S (or right-click and choose "Save as...").
+  3. Save it into this same folder, named exactly:  three.min.js
+
+On your phone or another computer: open Snugglevale Corner from your Claude sidebar.
+
+Asking a model to help with the village:
+  Tell it to read "START HERE - guide for helpers.md" first.
+  Every change it makes gets written in CHANGES.md.

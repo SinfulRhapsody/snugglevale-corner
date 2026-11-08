@@ -1,0 +1,14 @@
+Snugglevale Corner
+==================
+
+To play: double-click "Snugglevale Corner.html". It opens in your web browser.
+
+It needs the internet to load its 3D drawing kit, unless you save that kit here once:
+  1. Open this link in your browser:
+     https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js
+  2. Right-click the page, choose "Save as...", and save it into this same folder
+     with the name three.min.js
+After that it works with no internet at all.
+
+The same village is also pinned in your Claude sidebar and works on any device
+you're signed in on.
