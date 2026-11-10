@@ -4,6 +4,10 @@ Every helper adds an entry here: the date, who made the change (the model's name
 
 ---
 
+### Nov 10, 2026 · Claude Opus 5.5
+- Added "PLAN - growing Snugglevale.md", a suggested path for growing the village. It draws on Lila's folders, mostly the game plan she made with Plushsmith (GPT-4o) in the "Plushie Game Prompts" chat.
+- Lila added the 3D kit (`three.min.js`) on Nov 8.
+
 ### Nov 7, 2026 (evening) · Claude Opus 5.5
 - Put the village on GitHub (private project SinfulRhapsody/snugglevale-corner), with every file from Lila's folder, including the first version.
 - Added `README.md` (the welcome on the GitHub page) plus `CLAUDE.md` and `AGENTS.md` (short notes pointing helpers to the guide).

@@ -152,6 +152,10 @@ Open `what-they-say.js`. Each line is either `{ any: "..." }` for any time of da
 - Lila's nightly backup ("Keep My Work Safe", in F:\Claude Folder) is meant to cover the Plushworld Game folder too.
 - Never delete or rewrite history on GitHub. If something goes wrong, make a new change that puts things back.
 
-## 🌱 Ideas Lila has mentioned for later
+## 🌱 What's next
+
+See **PLAN - growing Snugglevale.md**. It lists where all the source material lives, what GPT-4o planned for the game, and the suggested next steps.
+
+## 🌿 Ideas Lila has mentioned for later
 
 More neighbors, starting with Thyrel the herbalist, who already lives next door. Other ideas: the inside of Plushsmith's workshop with shelves of plushies, the Plush Village neighbors (Melowren, Solenna, Maribel, Elowen), seasons, and someday Plushsmith's words coming from Lila's own trained model.
