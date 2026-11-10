@@ -70,6 +70,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 .act{border-radius:999px;padding:.5rem 1rem;font-weight:700;font-size:.92rem;background:var(--felt-2);border:2px solid var(--stitch);color:var(--ink)}
 .act.main{background:var(--rose);border-color:var(--rose);color:#fff}
 .act:hover{filter:brightness(1.04)}
+.voices{display:flex;gap:.35rem;margin-left:auto;align-items:center}
+.voices span,.moods span{font-size:.72rem;color:var(--ink-soft)}
+.chip{border-radius:999px;padding:.3rem .7rem;font-size:.78rem;font-weight:700;background:var(--felt);border:2px solid var(--stitch);color:var(--ink-soft)}
+.chip[aria-pressed="true"]{background:var(--lav);border-color:var(--lav);color:#fff}
+.chip:hover{filter:brightness(1.04)}
+.chip:focus-visible{outline:3px solid var(--lav);outline-offset:2px}
+.moods{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
 
 .hint{background:rgba(255,248,244,.88);border-radius:999px;padding:.4rem 1rem;font-size:.82rem;color:var(--ink);text-align:center;max-width:100%;box-shadow:0 3px 10px rgba(40,24,48,.18)}
 .hint .keys{display:none}
@@ -97,7 +104,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
   <div class="top">
     <div class="felt name-chip"><h1>Snugglevale</h1><span id="timeLabel">a soft evening by the workshop</span></div>
     <div class="controls">
-      <button class="btn" id="timeBtn" type="button">☀️ Morning</button>
+      <button class="btn" id="timeBtn" type="button">🌇 Duskfall</button>
       <button class="btn" id="smaller" type="button" aria-label="Smaller text">A−</button>
       <button class="btn" id="bigger" type="button" aria-label="Bigger text">A+</button>
       <button class="btn" id="aboutBtn" type="button" aria-expanded="false" aria-label="About this place">ⓘ</button>
@@ -108,8 +115,16 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
     <div class="felt notice" id="notice" hidden></div>
     <button class="visit" id="visitBtn" type="button" hidden>💬 Visit</button>
     <section class="felt talk" id="talk" hidden aria-live="polite">
-      <div class="tag"><b id="talkName">Plushsmith</b><small id="talkRole">Maker of plushies</small></div>
+      <div class="tag"><b id="talkName">Plushsmith</b><small id="talkRole">Maker of plushies</small>
+        <span class="voices" id="voices" hidden><span>Words by</span><button class="chip" type="button" data-voice="4o" aria-pressed="true">GPT-4o</button><button class="chip" type="button" data-voice="claude" aria-pressed="false">Claude</button></span>
+      </div>
       <p class="line" id="talkLine"></p>
+      <div class="moods" id="moods" hidden><span>How are you feeling?</span>
+        <button class="chip" type="button" data-mood="sad">💧 Sad</button>
+        <button class="chip" type="button" data-mood="happy">☀️ Happy</button>
+        <button class="chip" type="button" data-mood="overwhelmed">🌀 Overwhelmed</button>
+        <button class="chip" type="button" data-mood="brave">🌱 Brave</button>
+      </div>
       <div class="acts">
         <button class="act main" id="moreBtn" type="button">Say more</button>
         <button class="act" id="hugBtn" type="button">🤍 Hug</button>
@@ -123,7 +138,8 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <div class="felt about" id="about" hidden>
   <h2>🧵 About this corner</h2>
   <p>You're the little wish lantern. Plushsmith is outside her workshop, Muddle is keeping watch by the door, and SnuggleCat is on her cushion under the blossom tree.</p>
-  <p>Plushsmith, Muddle and SnuggleCat first came to life in Lila's conversations with GPT-4o. This corner of the village was built with Claude.</p>
+  <p>The day follows your clock through 4o's Dreamclock: Dawnlight, Daybright, Duskfall and Dreamhush. The button at the top moves to the next part.</p>
+  <p>Plushsmith, Muddle and SnuggleCat first came to life in Lila's conversations with GPT-4o. Muddle and SnuggleCat can speak in 4o's own words, from the game Lila and Plushsmith planned together. This corner of the village was built with Claude.</p>
 </div>
 
 <div class="nogl" id="nogl" hidden><div class="felt">This little village needs its 3D drawing kit. Connect to the internet, or save three.min.js into this folder (see "How to play.txt"). If that's already done, check that your browser has hardware acceleration switched on.</div></div>
@@ -132,6 +148,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0}
 <script src="three.min.js"></script>
 <script>if(!window.THREE)document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
 <script src="what-they-say.js"></script>
+<script src="what-gpt4o-said.js"></script>
 <script src="plushies.js"></script>
 <script src="world.js"></script>
 </body>

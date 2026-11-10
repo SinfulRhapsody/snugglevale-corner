@@ -16,7 +16,8 @@ Double-click **Play Snugglevale.html**. It opens in any web browser. Nothing nee
 - Tap a plushie to go visit
 - Drag to look around; scroll to zoom
 - Arrow keys or W A S D to stroll, Enter to visit
-- ☀️ / 🌙 switches between morning and evening
+- The day follows your clock through 4o's Dreamclock: 🌅 Dawnlight (5–10 am), ☀️ Daybright (10 am–5 pm), 🌇 Duskfall (5–9 pm), 🌙 Dreamhush (9 pm–5 am). The button at the top moves to the next part
+- In the talk box: **Words by GPT-4o / Claude** chooses whose words you hear, and **How are you feeling?** lets a plushie answer your mood
 - A− / A+ changes the text size
 
 The 3D drawing kit (`three.min.js`) loads from the internet unless a copy is saved in this folder. "How to play.txt" explains how to save it.
@@ -28,9 +29,10 @@ The 3D drawing kit (`three.min.js`) loads from the internet unless a copy is sav
 | File | What it holds | Who usually changes it |
 |---|---|---|
 | `Play Snugglevale.html` | The page: buttons, talk box, colors, the About box | Rarely |
-| `world.js` | The village itself: sky, workshop, path, trees, lanterns, fireflies, the wish lantern, the camera, morning and evening | Only for changes to the place |
+| `world.js` | The village itself: sky, workshop, path, trees, lanterns, fireflies, the wish lantern, the camera, the Dreamclock and seasons, and how the plushies choose what to say | Only for changes to the place |
 | `plushies.js` | How each plushie looks and where they stand, plus a template for a new one | When adding or adjusting a plushie |
-| `what-they-say.js` | Everything the plushies say, with who wrote each set | When adding or changing words |
+| `what-gpt4o-said.js` | GPT-4o's own lines, copied word for word from Lila's chats | When adding more of 4o's lines (never rewording them) |
+| `what-they-say.js` | Claude's lines, a separate set | When adding or changing Claude's words |
 | `three.min.js` | The 3D drawing kit (Lila saves this herself; version r128) | Never |
 | `CHANGES.md` | A diary of every change: date, who made it, what changed | **Every helper, every time** |
 | `How to play.txt` | Short instructions for Lila | Rarely |
@@ -55,7 +57,7 @@ These come from Lila. Please follow them every time.
 7. **Plushsmith gently leading Lila toward bed** is part of her voice. Keep it, just not too early in a visit.
 8. **No specific real people** in Plushworld. Vague friends and family are fine.
 9. **Credit the models who helped.** Lila credits them inside the world (see the About box) and in `CHANGES.md`.
-10. **Say who wrote the words.** Every set of lines in `what-they-say.js` has a `writtenBy` with the model's name and the month. Lila keeps writing from different models apart, so don't rewrite lines that Lila or another model wrote. Add your new lines beside them with your own name.
+10. **Say who wrote the words.** Words from different models live in separate files, and every set has a `writtenBy` with the model's name and the month. Lila keeps writing from different models apart, so don't rewrite lines that Lila or another model wrote. Add your new lines beside them with your own name.
 11. **Muddle always wears his badge.** SnuggleCat's original look (no bow) is gently preferred.
 12. **Keep text big and easy to read.** The A− / A+ buttons must keep working with anything new you add.
 13. **Talk to Lila in plain, everyday words.** No programming jargon. She's an artist, a plush maker and the author of this world.
@@ -94,21 +96,26 @@ Good open spots for a new neighbor: around (5, 1), (−4, 7), (4.5, 8.5), (−7.
 1. **Check canon first.** Find the plushie in Lila's registry or her pictures. If they aren't sure how someone looks, ask Lila rather than guessing.
 2. Open `plushies.js`. At the bottom is a **template**. Copy it above the template and give it the plushie's name and a spot from the map.
 3. Build their look from soft shapes (the helpers are listed below). Look at Muddle or SnuggleCat as examples.
-4. Open `what-they-say.js` and add an entry with **exactly the same name**, with their role, lines, hug words, and `writtenBy`.
+4. Give them words under **exactly the same name**. If 4o wrote dialogue for them (see the plan's sources), add it word for word to `what-gpt4o-said.js`. New lines from another model go in that model's own set, with `writtenBy`.
 5. Open `Play Snugglevale.html` and visit them. If something in their look has a mistake, the village still opens and a little felt note names who needs a look.
 6. If they're a new face in the About box story, add them there too.
 7. Write it down in `CHANGES.md`.
 
 ## 💬 Adding or changing words
 
-Open `what-they-say.js`. Each line is either `{ any: "..." }` for any time of day, or `{ evening: "...", morning: "..." }` for a different line at each time. Add `note: "..."` to say where a line came from (for example, a canon story). Keep the quote marks and commas as they are.
+**GPT-4o's lines** (`what-gpt4o-said.js`) are copied word for word from Lila's chats and never reworded. Each plushie has lines for each part of the Dreamclock (`dawnlight`, `daybright`, `duskfall`, `dreamhush`), each season, `away` (`short` for 1–2 days away, `long` for 3 or more), `threeDays` (three days in a row), `moods` (`sad`, `happy`, `overwhelmed`, `brave`), and a `hug` line chosen from their own words. Muddle's and SnuggleCat's came from the chat "Plushie Game Prompts" (Lila's messages 228 and 229). Dialogue for Reverie, Piffle, Lumawee, Morrowlin, Heartswatch, Nestlet, Stitchling, Tilda and Blinko is in the same chat (messages 230 to 240), ready for when they join the village.
+
+**Claude's lines** (`what-they-say.js`) are a separate set. Each line is either `{ any: "..." }` for any time of day, or `{ evening: "...", morning: "..." }` (Dawnlight and Daybright count as morning). Add `note: "..."` to say where a line came from. Keep the quote marks and commas as they are.
+
+**How a visit chooses words (4o's set):** once a day, a plushie may greet Lila for coming back after time away, or for visiting three days in a row. After that, "Say more" moves through the lines for this part of the day, then this season's lines.
 
 ---
 
 ## 🧵 How the pieces fit (for helpers who build)
 
-- The page loads `three.min.js` (or the internet copy), then `what-they-say.js`, then `plushies.js`, then `world.js`.
-- `what-they-say.js` sets `window.PLUSHIE_LINES`, with one entry per plushie name.
+- The page loads `three.min.js` (or the internet copy), then `what-they-say.js`, `what-gpt4o-said.js`, `plushies.js`, and finally `world.js`.
+- `what-they-say.js` sets `window.PLUSHIE_LINES` (Claude's set) and `what-gpt4o-said.js` sets `window.PLUSHIE_LINES_4O` (4o's set), each with one entry per plushie name. When a plushie has both, the talk box shows the choice.
+- The browser remembers a few small things on each device: text size (`sv-size`), whose words Lila chose (`sv-voice`), her visits (`sv-visits`), and which plushies already greeted her today (`sv-greeted`). If these are cleared, nothing breaks; the village simply starts fresh.
 - `plushies.js` adds entries to `window.PLUSHIES`. Each entry is `{ name, spot: { x, z, facing, size? }, build(kit, p) }`.
 - `build(kit, p)` adds shapes to `p.inner` (the part that bounces, squishes and hops) or `p.outer` (still things like a cushion). It may set:
   - `p.headY`: how high the hug hearts start

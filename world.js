@@ -157,7 +157,7 @@ const plushes=[];const trouble=[];
 (window.PLUSHIES||[]).forEach(def=>{
  const sp=def.spot||{x:0,z:0,facing:0};const yaw=sp.facing||0;
  const outer=new THREE.Group();outer.position.set(sp.x,0,sp.z);outer.rotation.y=yaw;const inner=new THREE.Group();outer.add(inner);
- const p={name:def.name,outer,inner,baseYaw:yaw,yaw,x:sp.x,z:sp.z,phase:Math.random()*6,squishT:9,hopT:9,waveT:9,near:false,line:0,baseY:0,headY:1.6};
+ const p={name:def.name,outer,inner,baseYaw:yaw,yaw,x:sp.x,z:sp.z,phase:Math.random()*6,squishT:9,hopT:9,waveT:9,near:false,line:0,line4o:0,noAdvance:false,baseY:0,headY:1.6};
  try{def.build(kit,p);}catch(e){trouble.push(def.name||"a plushie");console.error("Couldn't build "+def.name,e);return;}
  inner.position.y=p.baseY;
  outer.traverse(o=>{if(o.isMesh&&o.material.isMeshToonMaterial)o.castShadow=true;});
@@ -214,7 +214,34 @@ const PC={};for(const k in PAL)PC[k]=[new THREE.Color(PAL[k][0]),new THREE.Color
 const tmpC=new THREE.Color();
 const mix=(k,n)=>tmpC.copy(PC[k][0]).lerp(PC[k][1],n);
 const sunPos=[new V3(40,55,-70),new V3(-40,48,-80)];
-let night=1,nightT=1;
+/* The Dreamclock: 4o's four parts of the day (from "Plushie Game Prompts").
+   The village follows Lila's real clock; the button moves to the next part. */
+const PHASES=[
+ {id:"dawnlight",name:"Dawnlight",icon:"🌅",n:0.35,claude:"morning",about:"first soft light by the workshop"},
+ {id:"daybright",name:"Daybright",icon:"☀️",n:0,   claude:"morning",about:"a bright day by the workshop"},
+ {id:"duskfall", name:"Duskfall", icon:"🌇",n:0.72,claude:"evening",about:"a soft evening by the workshop"},
+ {id:"dreamhush",name:"Dreamhush",icon:"🌙",n:1,   claude:"evening",about:"a hushed night by the workshop"}];
+// Dawnlight 5–10am · Daybright 10am–5pm · Duskfall 5–9pm · Dreamhush 9pm–5am
+function clockPhase(){const h=new Date().getHours();return h>=5&&h<10?0:h>=10&&h<17?1:h>=17&&h<21?2:3;}
+let phaseI=clockPhase(),followClock=true;
+let night=PHASES[phaseI].n,nightT=night;
+
+/* The season, from the real calendar */
+const season=["winter","winter","spring","spring","spring","summer","summer","summer","autumn","autumn","autumn","winter"][new Date().getMonth()];
+const seasonName=season[0].toUpperCase()+season.slice(1);
+
+/* Visits: remembered on this device only, for "you've been away" and "three days in a row" */
+function dayKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function dayNum(k){const a=String(k).split("-").map(Number);return Math.round(Date.UTC(a[0],a[1]-1,a[2])/864e5);}
+const today=dayKey(new Date());
+let visits={};try{visits=JSON.parse(store.get("sv-visits")||"{}")||{};}catch(e){visits={};}
+let streak=1,missed=0;   // streak: days in a row · missed: whole days away before today
+if(visits.last){const gap=dayNum(today)-dayNum(visits.last);
+ if(!(gap>0)){streak=visits.streak||1;missed=visits.missed||0;}
+ else if(gap===1){streak=(visits.streak||1)+1;}
+ else{missed=gap-1;}}
+store.set("sv-visits",JSON.stringify({last:today,streak,missed}));
+
 function applyTime(n){
  skyU.top.value.copy(mix("skyTop",n));skyU.bottom.value.copy(mix("skyBot",n));scene.fog.color.copy(mix("fog",n));
  groundMat.color.copy(mix("ground",n));hillMat.color.copy(mix("hill",n));
@@ -228,26 +255,64 @@ function applyTime(n){
 }
 applyTime(night);
 
-/* ---------- talking (words from what-they-say.js) ---------- */
-const LINES=window.PLUSHIE_LINES||{};
+/* ---------- talking ----------
+   Two separate sets of words, never mixed:
+     GPT-4o's lines  (what-gpt4o-said.js)
+     Claude's lines  (what-they-say.js)
+   When a plushie has both, the talk box lets Lila choose. */
+const LINES=window.PLUSHIE_LINES||{}, LINES4O=window.PLUSHIE_LINES_4O||{};
+const anyOf=a=>a[Math.floor(Math.random()*a.length)];
+let voice=store.get("sv-voice")==="claude"?"claude":"4o";
+function voicesFor(name){const v=[];if(LINES4O[name])v.push("4o");if(LINES[name])v.push("claude");return v;}
+function voiceFor(name){const v=voicesFor(name);return v.indexOf(voice)>=0?voice:(v[0]||"claude");}
+// Claude's set
 function wordsFor(name){const w=LINES[name]||{};const lines=(w.lines&&w.lines.length)?w.lines:[{any:"Hello, Lila!"}];return{role:w.role||"",lines,hug:w.hug||"🤍"};}
-const talk=$("talk"),talkName=$("talkName"),talkRole=$("talkRole"),talkLine=$("talkLine"),visitBtn=$("visitBtn");
-let open=null,nearest=null,target=null,pending=null,stuck=0;
-const isNight=()=>nightT>0.5;
+const isNight=()=>PHASES[phaseI].claude==="evening";
 function lineText(l){if(typeof l==="string")return l;return l.any||(isNight()?l.evening:l.morning)||l.evening||l.morning||"";}
-function say(p){const w=wordsFor(p.name);talkLine.textContent=lineText(w.lines[p.line%w.lines.length]);}
-function nextLine(p){p.line=(p.line+1)%wordsFor(p.name).lines.length;}
-function openDialog(p){open=p;pending=null;target=null;p.hopT=0;talkName.textContent=p.name;talkRole.textContent=wordsFor(p.name).role;say(p);talk.hidden=false;visitBtn.hidden=true;}
+// GPT-4o's set: lines for this part of the Dreamclock, then this season
+function pool4o(name){const w=LINES4O[name]||{};return [].concat((w.phases&&w.phases[PHASES[phaseI].id])||[],(w.seasons&&w.seasons[season])||[]);}
+// once a day each plushie may greet Lila for being away, or for three days in a row
+function special4o(name){const w=LINES4O[name]||{};let g={};try{g=JSON.parse(store.get("sv-greeted")||"{}")||{};}catch(e){g={};}
+ if(g[name]===today)return null;
+ let list=null;if(missed>=3)list=w.away&&w.away.long;else if(missed>=1)list=w.away&&w.away.short;else if(streak>=3)list=w.threeDays;
+ if(!list||!list.length)return null;g[name]=today;store.set("sv-greeted",JSON.stringify(g));return anyOf(list);}
+
+const talk=$("talk"),talkName=$("talkName"),talkRole=$("talkRole"),talkLine=$("talkLine"),visitBtn=$("visitBtn");
+const voicesRow=$("voices"),moodsRow=$("moods");
+let open=null,nearest=null,target=null,pending=null,stuck=0;
+function say(p,opening){
+ if(voiceFor(p.name)==="4o"){
+  let t=opening?special4o(p.name):null;
+  if(t)p.noAdvance=true;else{const pool=pool4o(p.name);t=pool.length?pool[p.line4o%pool.length]:"";}
+  talkLine.textContent=t;
+ }else{const w=wordsFor(p.name);talkLine.textContent=lineText(w.lines[p.line%w.lines.length]);}
+}
+function nextLine(p){if(p.noAdvance){p.noAdvance=false;return;}if(voiceFor(p.name)==="4o")p.line4o++;else p.line=(p.line+1)%wordsFor(p.name).lines.length;}
+function showVoice(p){const v=voiceFor(p.name),all=voicesFor(p.name);
+ talkRole.textContent=v==="4o"?(LINES4O[p.name].role||""):wordsFor(p.name).role;
+ voicesRow.hidden=all.length<2;
+ voicesRow.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.voice===v)));
+ moodsRow.hidden=!(v==="4o"&&LINES4O[p.name]&&LINES4O[p.name].moods);}
+function openDialog(p){open=p;pending=null;target=null;p.hopT=0;talkName.textContent=p.name;showVoice(p);say(p,true);talk.hidden=false;visitBtn.hidden=true;}
 function closeDialog(){if(!open)return;nextLine(open);open.waveT=0;open=null;talk.hidden=true;}
-$("moreBtn").onclick=()=>{if(!open)return;nextLine(open);open.hopT=0;say(open);};
-$("hugBtn").onclick=()=>{if(!open)return;open.squishT=0;spawnHearts(open);talkLine.textContent=wordsFor(open.name).hug;};
+$("moreBtn").onclick=()=>{if(!open)return;nextLine(open);open.hopT=0;say(open,false);};
+$("hugBtn").onclick=()=>{if(!open)return;open.squishT=0;spawnHearts(open);
+ talkLine.textContent=voiceFor(open.name)==="4o"?(LINES4O[open.name].hug||"🤍"):wordsFor(open.name).hug;};
 $("byeBtn").onclick=()=>{closeDialog();canvas.focus({preventScroll:true});};
 visitBtn.onclick=()=>{if(nearest)openDialog(nearest);};
+voicesRow.querySelectorAll("button").forEach(b=>b.onclick=()=>{voice=b.dataset.voice;store.set("sv-voice",voice);if(open){open.noAdvance=false;showVoice(open);say(open,false);}});
+moodsRow.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!open)return;const w=LINES4O[open.name];const list=w&&w.moods&&w.moods[b.dataset.mood];if(!list||!list.length)return;
+ talkLine.textContent=anyOf(list);if(b.dataset.mood==="sad"||b.dataset.mood==="overwhelmed")open.squishT=0;else open.hopT=0;});
 
 /* ---------- buttons along the top ---------- */
 const timeBtn=$("timeBtn"),timeLabel=$("timeLabel");
-function setTimeUI(){timeBtn.textContent=nightT?"☀️ Morning":"🌙 Evening";timeLabel.textContent=nightT?"a soft evening by the workshop":"a bright morning by the workshop";if(open)say(open);}
-timeBtn.onclick=()=>{nightT=nightT?0:1;setTimeUI();};
+function setTimeUI(){const P=PHASES[phaseI];timeBtn.textContent=P.icon+" "+P.name;
+ timeBtn.setAttribute("aria-label","Time of day: "+P.name+". Tap for the next part of the day.");
+ timeLabel.textContent=P.about+" · "+seasonName;}
+setTimeUI();
+timeBtn.onclick=()=>{phaseI=(phaseI+1)%PHASES.length;followClock=false;nightT=PHASES[phaseI].n;setTimeUI();if(open){open.noAdvance=false;say(open,false);}};
+// while following the real clock, move along with it
+setInterval(()=>{if(!followClock)return;const c=clockPhase();if(c!==phaseI){phaseI=c;nightT=PHASES[phaseI].n;setTimeUI();}},60000);
 const SIZES=[17,20,23,26];let sizeI=1;const savedSize=parseInt(store.get("sv-size"),10);if(SIZES.indexOf(savedSize)>=0)sizeI=SIZES.indexOf(savedSize);
 function setSize(){document.documentElement.style.setProperty("--ui",SIZES[sizeI]+"px");store.set("sv-size",String(SIZES[sizeI]));}
 setSize();

@@ -4,6 +4,12 @@ Every helper adds an entry here: the date, who made the change (the model's name
 
 ---
 
+### Nov 10, 2026 (evening) · Claude Opus 5.5
+- Plan step 1: Muddle and SnuggleCat can now speak in GPT-4o's own words, 62 lines copied word for word from the chat "Plushie Game Prompts" into the new `what-gpt4o-said.js`. Lila chose to keep 4o's lines and Claude's as separate sets, and the talk box has a "Words by GPT-4o / Claude" choice.
+- The day now follows Lila's real clock through 4o's Dreamclock (Dawnlight, Daybright, Duskfall, Dreamhush). The button at the top moves to the next part. The season comes from the real calendar.
+- 4o's away lines, three-days-in-a-row lines and season lines all work. A "How are you feeling?" row gives 4o's mood lines.
+- Updated the guide, How to play, and the plan.
+
 ### Nov 10, 2026 · Claude Opus 5.5
 - Added "PLAN - growing Snugglevale.md", a suggested path for growing the village. It draws on Lila's folders, mostly the game plan she made with Plushsmith (GPT-4o) in the "Plushie Game Prompts" chat.
 - Lila added the 3D kit (`three.min.js`) on Nov 8.

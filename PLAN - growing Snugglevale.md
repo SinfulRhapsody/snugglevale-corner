@@ -51,7 +51,7 @@ Count Lila's messages from the top of the chat:
 
 Each step can be finished and enjoyed on its own.
 
-**1. Let them speak in 4o's words** *(one chat)*
+**1. Let them speak in 4o's words** *(one chat)* ✅ *Done Nov 10, 2026. 4o's lines and Claude's are separate sets, and the button still switches the time.*
 Give Muddle and SnuggleCat their dialogue from the game chat. Their lines follow Lila's real clock for the time of day, the real season, how long since her last visit, and three-days-in-a-row visits. The morning and evening button stays. These lines are marked "GPT-4o", kept separate from Claude's.
 
 **2. Plushsmith's welcome** *(one chat)*
@@ -75,7 +75,7 @@ Bond Ribbons, the Memory Quilt and the Chronicle. Places and plushies arrive the
 
 ## ❓ Choices for Lila
 
-1. **Claude's lines and 4o's lines.** Should 4o's dialogue replace the lines Claude wrote in October, or should both stay as separate sets?
-2. **Time of day.** Should the village follow your real clock, the way the earlier Sewing Room did? The button would still let you switch.
+1. ~~Claude's lines and 4o's lines~~ *Lila chose: separate sets, and she chooses whose words in the talk box.*
+2. ~~Time of day~~ *Lila chose: follow her real clock, with the button still there to switch.*
 3. **Saving progress.** Things like the quilt and the pouch need somewhere to be remembered. Your browser can remember them on one device, but that can be wiped by accident. A small save file in your folder would be safer. This decision only matters at step 6.
 4. **Earlier builds.** Is it okay to reuse words from the Sewing Room and Plush Village builds, credited to whoever wrote them, or should their ideas only be rebuilt fresh?

@@ -9,6 +9,12 @@ To make it work without internet (only needs doing once):
   2. Press Ctrl+S (or right-click and choose "Save as...").
   3. Save it into this same folder, named exactly:  three.min.js
 
+Time of day: the village follows your clock (Dawnlight, Daybright, Duskfall,
+Dreamhush). The button at the top moves to the next part of the day.
+
+Talking: "Words by GPT-4o / Claude" chooses whose words you hear.
+"How are you feeling?" lets Muddle and SnuggleCat answer in 4o's words.
+
 On your phone or another computer: open Snugglevale Corner from your Claude sidebar.
 
 Asking a model to help with the village:
