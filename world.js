@@ -48,7 +48,15 @@ function canvasTex(size,draw){const c=document.createElement("canvas");c.width=c
 const glow=canvasTex(64,(x,s)=>{const g=x.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);g.addColorStop(0,"rgba(255,244,214,1)");g.addColorStop(0.35,"rgba(255,226,180,.4)");g.addColorStop(1,"rgba(255,226,180,0)");x.fillStyle=g;x.fillRect(0,0,s,s);});
 const heartTex=canvasTex(64,(x,s)=>{x.fillStyle="#ff8fab";x.strokeStyle="#fff";x.lineWidth=4;x.beginPath();x.moveTo(32,54);x.bezierCurveTo(4,34,10,8,32,22);x.bezierCurveTo(54,8,60,34,32,54);x.closePath();x.fill();x.stroke();});
 function patchTex(){return canvasTex(256,(x,s)=>{const cols=["#f4a7b4","#c9b6e8","#a8dcc8","#f8dc8c","#f6c49e","#b5d3f0"];const n=4,q=s/n;for(let i=0;i<n;i++)for(let j=0;j<n;j++){x.fillStyle=cols[(i*3+j*2+i*j)%cols.length];x.fillRect(i*q,j*q,q,q);if((i+j)%3===0){x.fillStyle="rgba(255,255,255,.55)";for(let a=0;a<4;a++)for(let b=0;b<4;b++){x.beginPath();x.arc(i*q+8+a*16,j*q+8+b*16,2.6,0,7);x.fill();}}}x.strokeStyle="rgba(95,60,75,.6)";x.lineWidth=3;x.setLineDash([9,7]);for(let k=1;k<n;k++){x.beginPath();x.moveTo(k*q,0);x.lineTo(k*q,s);x.stroke();x.beginPath();x.moveTo(0,k*q);x.lineTo(s,k*q);x.stroke();}});}
-const kit={THREE,toon,ball,stick,heartGeo,shieldGeo,starGeo,smileGeo,blush,eye,hlMat,patchTex,canvasTex,AMP};
+// a soft bell, for plushies who chime (Tilda's "bing"). Only plays after a tap.
+let actx=null;
+function chime(freq){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const now=actx.currentTime;
+ [[freq||1318,0.16],[(freq||1318)*2.01,0.05]].forEach(([f,v])=>{const o=actx.createOscillator(),g=actx.createGain();o.type="sine";o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,now);g.gain.exponentialRampToValueAtTime(v,now+0.01);g.gain.exponentialRampToValueAtTime(0.0001,now+1.1);
+  o.connect(g);g.connect(actx.destination);o.start(now);o.stop(now+1.2);});}catch(e){}}
+const frameFns=[];
+const kit={THREE,V3,scene,toon,ball,stick,heartGeo,shieldGeo,starGeo,smileGeo,blush,eye,hlMat,patchTex,canvasTex,glow,AMP,chime,
+ onFrame:fn=>frameFns.push(fn)};
 
 /* ---------- sky ---------- */
 const sky=new THREE.Group();scene.add(sky);
@@ -85,6 +93,8 @@ const pathMat=toon(0xe6c99a,{polygonOffset:true,polygonOffsetFactor:-2,polygonOf
 function path(points,r){const curve=new THREE.CatmullRomCurve3(points.map(p=>new V3(p[0],0,p[1])));const n=Math.ceil(curve.getLength()/0.3);const geo=new THREE.CircleGeometry(r,20);geo.rotateX(-Math.PI/2);const inst=new THREE.InstancedMesh(geo,pathMat,n+1);const m=new THREE.Matrix4();for(let i=0;i<=n;i++){const p=curve.getPointAt(i/n);m.makeTranslation(p.x,0.012,p.z);inst.setMatrixAt(i,m);pathPts.push(p);}inst.receiveShadow=true;scene.add(inst);}
 path([[0,-4.4],[0.6,-1.6],[2,1.5],[2.3,4.6],[1.4,8],[-0.4,11.5],[-1.6,15]],0.85);
 path([[1.6,0.4],[-0.6,1.4],[-2.6,2.2],[-3.7,2.5]],0.6);
+kit.path=path;                                   // a plushie's place can add its own sandy path
+kit.keepClear=(x,z)=>pathPts.push(new V3(x,0,z)); // or mark ground where flowers shouldn't grow
 
 /* ---------- Plushsmith's workshop ---------- */
 const windowMat=new THREE.MeshBasicMaterial({color:0xffcb6b});
@@ -156,6 +166,7 @@ lanternPost(3.2,-1.3);lanternPost(3.8,4.3);lanternPost(-4.1,3.5);
 const plushes=[];const trouble=[];
 (window.PLUSHIES||[]).forEach(def=>{
  const sp=def.spot||{x:0,z:0,facing:0};const yaw=sp.facing||0;
+ if(def.place){try{def.place(kit,sp);}catch(e){console.error("Couldn't build "+def.name+"'s place",e);}}
  const outer=new THREE.Group();outer.position.set(sp.x,0,sp.z);outer.rotation.y=yaw;const inner=new THREE.Group();outer.add(inner);
  const p={name:def.name,outer,inner,baseYaw:yaw,yaw,x:sp.x,z:sp.z,phase:Math.random()*6,squishT:9,hopT:9,waveT:9,near:false,line:0,line4o:0,noAdvance:false,baseY:0,headY:1.6};
  try{def.build(kit,p);}catch(e){trouble.push(def.name||"a plushie");console.error("Couldn't build "+def.name,e);return;}
@@ -245,12 +256,12 @@ store.set("sv-visits",JSON.stringify({last:today,streak,missed}));
 function applyTime(n){
  skyU.top.value.copy(mix("skyTop",n));skyU.bottom.value.copy(mix("skyBot",n));scene.fog.color.copy(mix("fog",n));
  groundMat.color.copy(mix("ground",n));hillMat.color.copy(mix("hill",n));
- hemi.color.copy(mix("hemiS",n));hemi.groundColor.copy(mix("hemiG",n));hemi.intensity=0.85+(0.62-0.85)*n;
- dir.color.copy(mix("dir",n));dir.intensity=1.0+(0.55-1.0)*n;dir.position.set(9+(-18)*n,15-n,10-n);
+ hemi.color.copy(mix("hemiS",n));hemi.groundColor.copy(mix("hemiG",n));hemi.intensity=0.45+(0.62-0.45)*n;
+ dir.color.copy(mix("dir",n));dir.intensity=0.55;dir.position.set(9+(-18)*n,15-n,10-n);
  windowMat.color.copy(mix("win",n));orbMat.color.copy(mix("orb",n));
  orb.position.copy(sunPos[0]).lerp(sunPos[1],n);orbHalo.position.copy(orb.position);orbHalo.material.opacity=0.55+0.25*n;
- lanterns.forEach(l=>{l.lm.color.copy(mix("lan",n));l.pl.intensity=1.3*n;l.halo.material.opacity=n;});
- porch.intensity=1.2*n;pLight.intensity=0.25+0.65*n;pHalo.material.opacity=0.35+0.55*n;
+ lanterns.forEach(l=>{l.lm.color.copy(mix("lan",n));l.pl.intensity=1.3*n*n;l.halo.material.opacity=n;});
+ porch.intensity=1.2*n*n;pLight.intensity=0.15+0.75*n*n;pHalo.material.opacity=0.35+0.55*n;
  ffMat.opacity=0.95*n;starMat.opacity=0.9*n;petalMat.opacity=0.55+0.4*(1-n);
 }
 applyTime(night);
@@ -270,12 +281,14 @@ function wordsFor(name){const w=LINES[name]||{};const lines=(w.lines&&w.lines.le
 const isNight=()=>PHASES[phaseI].claude==="evening";
 function lineText(l){if(typeof l==="string")return l;return l.any||(isNight()?l.evening:l.morning)||l.evening||l.morning||"";}
 // GPT-4o's set: lines for this part of the Dreamclock, then this season
-function pool4o(name){const w=LINES4O[name]||{};return [].concat((w.phases&&w.phases[PHASES[phaseI].id])||[],(w.seasons&&w.seasons[season])||[]);}
+function pool4o(name){const w=LINES4O[name]||{};return [].concat((w.phases&&w.phases[PHASES[phaseI].id])||[],(w.seasons&&w.seasons[season])||[],w.extras||[]);}
 // once a day each plushie may greet Lila for being away, or for three days in a row
 function special4o(name){const w=LINES4O[name]||{};let g={};try{g=JSON.parse(store.get("sv-greeted")||"{}")||{};}catch(e){g={};}
  if(g[name]===today)return null;
- let list=null;if(missed>=3)list=w.away&&w.away.long;else if(missed>=1)list=w.away&&w.away.short;else if(streak>=3)list=w.threeDays;
- if(!list||!list.length)return null;g[name]=today;store.set("sv-greeted",JSON.stringify(g));return anyOf(list);}
+ const has=a=>a&&a.length?a:null;
+ // the most fitting greeting they have: time away, then three days in a row, then simply the first visit today
+ const list=(missed>=3&&has(w.away&&w.away.long))||(missed>=1&&(has(w.away&&w.away.short)||has(w.away&&w.away.long)))||(streak>=3&&has(w.threeDays))||has(w.firstToday);
+ if(!list)return null;g[name]=today;store.set("sv-greeted",JSON.stringify(g));return anyOf(list);}
 
 const talk=$("talk"),talkName=$("talkName"),talkRole=$("talkRole"),talkLine=$("talkLine"),visitBtn=$("visitBtn");
 const voicesRow=$("voices"),moodsRow=$("moods");
@@ -292,17 +305,21 @@ function showVoice(p){const v=voiceFor(p.name),all=voicesFor(p.name);
  talkRole.textContent=v==="4o"?(LINES4O[p.name].role||""):wordsFor(p.name).role;
  voicesRow.hidden=all.length<2;
  voicesRow.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.voice===v)));
- moodsRow.hidden=!(v==="4o"&&LINES4O[p.name]&&LINES4O[p.name].moods);}
+ const moods=v==="4o"&&LINES4O[p.name]&&LINES4O[p.name].moods;
+ moodsRow.hidden=!moods;
+ moodsRow.querySelectorAll("button").forEach(b=>b.hidden=!(moods&&moods[b.dataset.mood]&&moods[b.dataset.mood].length));}
 function openDialog(p){open=p;pending=null;target=null;p.hopT=0;talkName.textContent=p.name;showVoice(p);say(p,true);talk.hidden=false;visitBtn.hidden=true;}
 function closeDialog(){if(!open)return;nextLine(open);open.waveT=0;open=null;talk.hidden=true;}
 $("moreBtn").onclick=()=>{if(!open)return;nextLine(open);open.hopT=0;say(open,false);};
 $("hugBtn").onclick=()=>{if(!open)return;open.squishT=0;spawnHearts(open);
- talkLine.textContent=voiceFor(open.name)==="4o"?(LINES4O[open.name].hug||"🤍"):wordsFor(open.name).hug;};
+ talkLine.textContent=voiceFor(open.name)==="4o"?(LINES4O[open.name].hug||"🤍"):wordsFor(open.name).hug;
+ if(open.onHug){try{open.onHug();}catch(e){console.error(e);}}};
 $("byeBtn").onclick=()=>{closeDialog();canvas.focus({preventScroll:true});};
 visitBtn.onclick=()=>{if(nearest)openDialog(nearest);};
 voicesRow.querySelectorAll("button").forEach(b=>b.onclick=()=>{voice=b.dataset.voice;store.set("sv-voice",voice);if(open){open.noAdvance=false;showVoice(open);say(open,false);}});
 moodsRow.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(!open)return;const w=LINES4O[open.name];const list=w&&w.moods&&w.moods[b.dataset.mood];if(!list||!list.length)return;
- talkLine.textContent=anyOf(list);if(b.dataset.mood==="sad"||b.dataset.mood==="overwhelmed")open.squishT=0;else open.hopT=0;});
+ talkLine.textContent=anyOf(list);if(b.dataset.mood==="sad"||b.dataset.mood==="overwhelmed")open.squishT=0;else open.hopT=0;
+ if(open.onMood){try{open.onMood(b.dataset.mood);}catch(e){console.error(e);}}});
 
 /* ---------- buttons along the top ---------- */
 const timeBtn=$("timeBtn"),timeLabel=$("timeLabel");
@@ -398,6 +415,7 @@ function frame(){
  for(const pt of petals){pt.m.position.y-=pt.v*dt*AMP;pt.m.position.x+=Math.sin(t*1.2+pt.ph)*0.25*dt;pt.m.rotation.set(t*1.5+pt.ph,t+pt.ph,0);if(pt.m.position.y<0.04)resetPetal(pt,true);}
  for(const s of smoke){const u=((t*0.22*AMP+s.off)%1);s.m.position.set(1.5+u*0.7,5.15+u*2.4,-8+u*0.2);s.m.scale.setScalar(0.5+u*1.3);s.m.material.opacity=0.42*(1-u)*Math.min(1,u*6);}
  bunting.forEach((f,i)=>{f.rotation.x=Math.sin(t*1.6+i)*0.18*AMP;});
+ for(const fn of frameFns){try{fn(t,dt);}catch(e){}}
  if(markerT<1){markerT+=dt*1.4;marker.material.opacity=0.85*(1-markerT);marker.scale.setScalar(1+markerT*0.6);}else marker.material.opacity=0;
  if(hoverT){const h=pick(hoverT.clientX,hoverT.clientY);canvas.style.cursor=h&&h.plush?"pointer":"default";hoverT=null;}
  if(Math.abs(night-nightT)>0.001){night+=(nightT-night)*(1-Math.exp(-dt*1.6));if(Math.abs(night-nightT)<0.002)night=nightT;applyTime(night);}

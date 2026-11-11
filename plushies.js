@@ -181,6 +181,143 @@ window.PLUSHIES.push({
   }
 });
 
+/* ---------- Tilda and her Wonderloop Path ----------
+   Look: Lila's reference photo (PlushworldDocs/reference-photos/02-whispermind-quartet/tilda-01.png),
+   as the registry says the photo wins: a curving question-mark shape, peach at the top
+   into dusty blue into lavender at the base, gold star eyes, a small curved smile,
+   stubby arm nubs, gold question marks stitched across her.
+   Movement, from 4o's game profile for her: she bounces in loops trailing question marks,
+   twirls hello, makes a quiet "bing" and a sparkle burst when hugged, and when Lila is sad
+   she grows quieter: her question marks dim and her bouncing slows.
+   Her place, from 4o's world map: "A spiraling ribbon trail that changes each time you
+   walk it... tiny question-marks float in the air." It sits east, like her Twirl Zone
+   in Fort Hope. */
+(function(){
+  const shared = { glow: 1 };   // shared by Tilda and her path: how brightly the question marks shine
+  function questionTex(kit, color) {
+    return kit.canvasTex(64, (x, s) => {
+      x.fillStyle = color; x.textAlign = "center"; x.textBaseline = "middle";
+      x.font = "bold 52px Georgia, 'Times New Roman', serif"; x.fillText("?", s/2, s/2 + 3);
+    });
+  }
+
+  window.PLUSHIES.push({
+    name: "Tilda",
+    spot: { x: 5.6, z: 1.2, facing: -1.1 },
+
+    place(kit, spot) {
+      const { THREE, V3, scene, toon, AMP } = kit;
+      // a little sandy path over from the main path
+      kit.path([[2.2, 2.6], [3.3, 2.1], [4.2, 1.7]], 0.5);
+      // the spiral ribbon: its colors start somewhere new each visit, so it changes each time
+      const bands = [0xf4b6a3, 0xa9cdd2, 0xc4b5e3, 0xf6dfa0];
+      const start = Math.random() * Math.PI * 2, shift = Math.floor(Math.random() * bands.length);
+      const N = 150, turns = 2.3, r0 = 0.55, r1 = 1.75, w = 0.32;
+      const verts = [], cols = [], idx = [], c = new THREE.Color();
+      for (let i = 0; i <= N; i++) {
+        const u = i / N, a = start + u * turns * Math.PI * 2, r = r0 + (r1 - r0) * u;
+        const cx = Math.cos(a) * r, cz = Math.sin(a) * r;
+        const nx = Math.cos(a), nz = Math.sin(a);        // outward, across the ribbon
+        verts.push(cx - nx * w/2, 0, cz - nz * w/2,  cx + nx * w/2, 0, cz + nz * w/2);
+        c.setHex(bands[(Math.floor(u * 18) + shift) % bands.length]);
+        cols.push(c.r, c.g, c.b, c.r, c.g, c.b);
+        if (i < N) { const k = i * 2; idx.push(k, k+1, k+2, k+1, k+3, k+2); }
+        kit.keepClear(spot.x + cx, spot.z + cz);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+      g.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3));
+      g.setIndex(idx); g.computeVertexNormals();
+      const ribbon = new THREE.Mesh(g, toon(0xffffff, { vertexColors: true, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 }));
+      ribbon.position.set(spot.x, 0.02, spot.z); ribbon.receiveShadow = true; scene.add(ribbon);
+      // tiny question marks floating in the air
+      const tex = questionTex(kit, "#f2c46d"), floaters = [];
+      for (let i = 0; i < 9; i++) {
+        const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+        const sc = 0.22 + Math.random() * 0.14; s.scale.set(sc, sc, 1); scene.add(s);
+        floaters.push({ s, a: Math.random() * 6.3, r: 0.9 + Math.random() * 1.1, h: 0.8 + Math.random() * 1.3, sp: 0.15 + Math.random() * 0.2, ph: Math.random() * 6 });
+      }
+      kit.onFrame((t) => {
+        for (const f of floaters) {
+          const a = f.a + t * f.sp * (0.4 + 0.6 * shared.glow) * AMP;
+          f.s.position.set(spot.x + Math.cos(a) * f.r, f.h + Math.sin(t * 0.8 + f.ph) * 0.18 * AMP, spot.z + Math.sin(a) * f.r);
+          f.s.material.opacity = 0.25 + 0.65 * shared.glow;
+        }
+      });
+    },
+
+    build(kit, p) {
+      const { THREE, V3, toon, ball, stick, starGeo, smileGeo, AMP } = kit;
+      const I = p.inner; p.headY = 1.7;
+      // her body: one soft curl, thick in the middle and thin at both tips
+      const pts = [[-0.40,1.10],[-0.48,1.38],[-0.25,1.62],[0.10,1.66],[0.32,1.45],[0.25,1.10],[0.00,0.80],[-0.25,0.50],[-0.20,0.24],[0.10,0.17],[0.40,0.28],[0.50,0.52]]
+        .map(a => new V3(a[0], a[1] + 0.06, 0));
+      const curve = new THREE.CatmullRomCurve3(pts);
+      const TS = 120, RS = 18, R0 = 0.3;
+      const prof = [[0,0.07],[0.1,0.15],[0.25,0.24],[0.4,0.31],[0.55,0.30],[0.7,0.27],[0.85,0.23],[0.95,0.15],[1,0.09]];
+      const rad = u => { for (let i = 1; i < prof.length; i++) if (u <= prof[i][0]) { const a = prof[i-1], b = prof[i], k = (u - a[0]) / (b[0] - a[0]); return a[1] + (b[1] - a[1]) * k; } return 0.09; };
+      const peach = new THREE.Color(0xf2b19c), blue = new THREE.Color(0x9db8bd), lav = new THREE.Color(0xa99bc9), tc = new THREE.Color();
+      const sm = x => { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+      const grad = u => u < 0.6 ? tc.copy(peach).lerp(blue, sm((u - 0.3) / 0.3)) : tc.copy(blue).lerp(lav, sm((u - 0.62) / 0.28));
+      const geo = new THREE.TubeGeometry(curve, TS, R0, RS, false);
+      const pos = geo.attributes.position, cols = [], P = new V3(), V = new V3();
+      for (let i = 0; i < pos.count; i++) {
+        const u = Math.floor(i / (RS + 1)) / TS; curve.getPointAt(u, P);
+        V.fromBufferAttribute(pos, i).sub(P).multiplyScalar(rad(u) / R0).add(P); pos.setXYZ(i, V.x, V.y, V.z);
+        const cc = grad(u); cols.push(cc.r, cc.g, cc.b);
+      }
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3)); geo.computeVertexNormals();
+      const felt = toon(0xffffff, { vertexColors: true });
+      const body = new THREE.Group(); I.add(body);
+      body.add(new THREE.Mesh(geo, felt));
+      for (const u of [0, 1]) { const tip = ball(rad(u), toon(grad(u).getHex()), 1, 1, 1, 16); curve.getPointAt(u, tip.position); body.add(tip); }
+      // little arm nubs: blue on one side, peach on the other
+      const at = u => curve.getPointAt(u, new V3());
+      const L = at(0.62), Rt = at(0.47);
+      const nubL = ball(0.09, toon(0x9db8bd), 1.7, 0.9, 1); nubL.position.set(L.x - 0.3, L.y + 0.06, 0.02); nubL.rotation.z = 0.35; body.add(nubL);
+      const nubR = ball(0.09, toon(0xf2b19c), 1.7, 0.9, 1); nubR.position.set(Rt.x + 0.33, Rt.y - 0.08, 0.02); nubR.rotation.z = -0.3; body.add(nubR);
+      // face: gold star eyes and a small curved smile
+      const F = at(0.42), fr = rad(0.42);
+      const face = new THREE.Group(); face.position.copy(F); body.add(face); p.head = face;
+      const gold = toon(0xe0aa48, { emissive: 0x3a2600 });
+      for (const s of [-1, 1]) stick(face, new THREE.Mesh(starGeo(0.05), gold), fr, 0.11 * s, 0.07, 0.01);
+      stick(face, new THREE.Mesh(smileGeo(0.06, 0.011), gold), fr, 0, -0.03, 0.012);
+      // gold question marks stitched across her lower body
+      const qMat = new THREE.MeshBasicMaterial({ map: questionTex(kit, "#c8923c"), transparent: true, depthWrite: false });
+      [[0.58,-0.12],[0.66,0.1],[0.74,-0.05],[0.82,0.12],[0.88,-0.1],[0.94,0.06]].forEach(([u, dx]) => {
+        const c = at(u), q = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.11), qMat);
+        q.position.set(c.x + dx, c.y + 0.02, rad(u) * 0.93); body.add(q);
+      });
+      // sparkle burst for hugs
+      const sparkTex = kit.canvasTex(32, (x, s) => { x.fillStyle = "#fff3c4"; x.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, r = i % 2 ? 4 : 15; x.lineTo(s/2 + Math.cos(a) * r, s/2 + Math.sin(a) * r); } x.closePath(); x.fill(); });
+      const sparks = [];
+      for (let i = 0; i < 14; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: sparkTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); sp.visible = false; sp.scale.set(0.16, 0.16, 1); I.add(sp); sparks.push({ sp, v: new V3() }); }
+      let sparkT = 9;
+      p.onHug = () => {
+        sparkT = 0; kit.chime(1568);
+        sparks.forEach(s => { s.sp.visible = true; s.sp.position.set(0.15, 1.35, 0.25); s.v.set((Math.random() - 0.5) * 2.2, 0.6 + Math.random() * 1.6, (Math.random() - 0.2) * 1.4); });
+      };
+      p.quietT = 0;
+      p.onMood = (m) => { if (m === "sad") p.quietT = 25; };   // she grows quieter for a while
+      const ease = x => x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+      p.idle = (t, far, dt) => {
+        const quiet = p.quietT > 0; if (quiet) p.quietT -= dt;
+        shared.glow += ((quiet ? 0.3 : 1) - shared.glow) * Math.min(1, dt * 1.5);
+        const speed = quiet ? 1.3 : 3.2, amp = (quiet ? 0.025 : 0.11) * AMP;
+        p.inner.position.y += Math.abs(Math.sin(t * speed + p.phase)) * amp;            // bouncing in little loops
+        p.inner.rotation.z = Math.sin(t * speed * 0.5) * 0.07 * AMP * (quiet ? 0.3 : 1);
+        p.inner.rotation.y = (AMP === 1 && p.waveT < 1.1) ? ease(p.waveT / 1.1) * Math.PI * 2 : 0;   // a twirl hello
+        qMat.opacity = 0.45 + 0.55 * shared.glow;
+        if (sparkT < 1.4) {
+          sparkT += dt;
+          sparks.forEach(s => { s.v.y -= 2.2 * dt; s.sp.position.addScaledVector(s.v, dt); s.sp.material.opacity = Math.max(0, 1 - sparkT / 1.4); });
+          if (sparkT >= 1.4) sparks.forEach(s => s.sp.visible = false);
+        }
+      };
+    }
+  });
+})();
+
 /* ---------- TEMPLATE for a new plushie ----------
    Copy the example below (from window.PLUSHIES.push to the closing });)
    to just above this template, then change the name, spot, colors and shapes.

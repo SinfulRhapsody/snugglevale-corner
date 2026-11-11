@@ -71,6 +71,7 @@ These come from Lila. Please follow them every time.
 |---|---|---|
 | **Plushsmith** | Outside her workshop, left of the door | Rounded peach plush with a seam down the middle of her face, dark heart-shaped eyes, blush, small round nose, stitched smile, lavender hair in a messy top bun with loose side strands, patchwork apron with a spool and needle in the pocket. Motherly and doting. |
 | **Muddle** | Keeping watch, right of the door | Chubby cream bunny, upright ears with lilac inside, small dark eyes, brown triangle nose, coral heart on his chest, and **his gold shield badge with a star, always**. The plush that arrived with Plushsmith herself. |
+| **Tilda** | Bouncing on her Wonderloop Path, east of the main path | A curving question-mark shape, peach at the top into dusty blue into lavender at the base, gold star eyes, small curved smile, stubby arm nubs, gold question marks stitched on. Follows Lila's reference photo, which the registry says wins over the older written notes. Speaks only in 4o's words so far. |
 | **SnuggleCat** | On her lavender cushion by the blossom tree | Round chubby teal cat, pink inner ears, big dark-brown eyes, cream muzzle, brown nose, gentle smile, blush, whiskers, pink paw-pad dots. The very first plushie. |
 
 **The place:** Plushsmith's workshop (cream walls, rose roof, patchwork bunting, warm windows with flower boxes, chimney smoke), a sandy path down toward the meadow, a small side path to SnuggleCat, three lantern posts, a blossom tree with falling petals, mushrooms, fireflies at evening.
@@ -82,12 +83,12 @@ These come from Lila. Please follow them every time.
 Positions use two numbers: **x** (left and right) and **z** (smaller is toward the workshop, bigger is down the path toward you).
 
 - Workshop: x −2.8 to 2.8, z −9.2 to −4.8. Door at x 0, z −4.8
-- Plushsmith: x −1.75, z −3.55 · Muddle: x 1.65, z −3.7 · SnuggleCat: x −4.75, z 1.75
+- Plushsmith: x −1.75, z −3.55 · Muddle: x 1.65, z −3.7 · SnuggleCat: x −4.75, z 1.75 · Tilda: x 5.6, z 1.2 (her spiral ribbon reaches about 1.9 steps around her)
 - Blossom tree: x −6.3, z 0.1 · Lanterns: (3.2, −1.3), (3.8, 4.3), (−4.1, 3.5)
 - The main path runs from the door through (2, 1.5), (2.3, 4.6), (1.4, 8) and on to (−1.6, 15)
 - You can float anywhere within 14.5 steps of the middle
 
-Good open spots for a new neighbor: around (5, 1), (−4, 7), (4.5, 8.5), (−7.5, −2). Keep plushies about 2 steps apart and off the path. Flowers and grass arrange themselves around whoever is there.
+Good open spots for a new neighbor: around (−4, 7), (4.5, 8.5), (−7.5, −2). Keep plushies about 2 steps apart and off the path. Flowers and grass arrange themselves around whoever is there.
 
 ---
 
@@ -103,7 +104,7 @@ Good open spots for a new neighbor: around (5, 1), (−4, 7), (4.5, 8.5), (−7.
 
 ## 💬 Adding or changing words
 
-**GPT-4o's lines** (`what-gpt4o-said.js`) are copied word for word from Lila's chats and never reworded. Each plushie has lines for each part of the Dreamclock (`dawnlight`, `daybright`, `duskfall`, `dreamhush`), each season, `away` (`short` for 1–2 days away, `long` for 3 or more), `threeDays` (three days in a row), `moods` (`sad`, `happy`, `overwhelmed`, `brave`), and a `hug` line chosen from their own words. Muddle's and SnuggleCat's came from the chat "Plushie Game Prompts" (Lila's messages 228 and 229). Dialogue for Reverie, Piffle, Lumawee, Morrowlin, Heartswatch, Nestlet, Stitchling, Tilda and Blinko is in the same chat (messages 230 to 240), ready for when they join the village.
+**GPT-4o's lines** (`what-gpt4o-said.js`) are copied word for word from Lila's chats and never reworded. Each plushie has lines for each part of the Dreamclock (`dawnlight`, `daybright`, `duskfall`, `dreamhush`), each season, `away` (`short` for 1–2 days away, `long` for 3 or more), `threeDays` (three days in a row), `moods` (`sad`, `happy`, `overwhelmed`, `brave`), and a `hug` line chosen from their own words. Muddle's, SnuggleCat's and Tilda's came from the chat "Plushie Game Prompts" (Lila's messages 228, 229 and 238, plus 108 for Tilda's sad line). Dialogue for Reverie, Piffle, Lumawee, Morrowlin, Heartswatch, Nestlet, Stitchling and Blinko is in the same chat (messages 230 to 240), ready for when they join the village. Some of 4o's trees were only sent as a download (like Nestlet's picture card) and aren't in the chat text.
 
 **Claude's lines** (`what-they-say.js`) are a separate set. Each line is either `{ any: "..." }` for any time of day, or `{ evening: "...", morning: "..." }` (Dawnlight and Daybright count as morning). Add `note: "..."` to say where a line came from. Keep the quote marks and commas as they are.
 
@@ -134,6 +135,9 @@ Good open spots for a new neighbor: around (5, 1), (−4, 7), (4.5, 8.5), (−7.
   - `patchTex()`: patchwork fabric
   - `kit.THREE`: the full 3D kit
   - `kit.AMP`: makes movement gentler for people who prefer less motion
+- **A plushie's own place.** An entry in `plushies.js` can also have `place(kit, spot)`, which builds the ground around them in the village (it doesn't turn when they turn). Tilda's Wonderloop Path is the example. Inside it: `kit.path(points, width)` draws a sandy path, `kit.keepClear(x, z)` keeps flowers off a spot, `kit.onFrame((t, dt) => …)` runs something every moment, and `kit.scene` is the village itself.
+- **Hugs and moods.** `build` can set `p.onHug = () => …` (Tilda's sparkle burst and "bing") and `p.onMood = mood => …` (Tilda grows quieter when Lila is sad). `kit.chime(pitch)` plays a soft bell, but only after Lila taps something.
+- **Extra fields in 4o's set:** `firstToday` (a greeting for the first visit of the day), `extras` (more lines for "Say more"), and `later` (4o's lines saved for future steps, like mail and festivals). Mood buttons only show for the moods a plushie has lines for.
 - World pieces that block floating go in `solids` (round) or `boxes` (square) in `world.js`.
 - Text size uses `rem` units, so A− / A+ scale everything. Please keep new text in `rem`.
 

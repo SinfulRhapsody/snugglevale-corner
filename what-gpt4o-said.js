@@ -78,6 +78,47 @@ window.PLUSHIE_LINES_4O = {
       brave:       ["You’re quieter, but taller inside. I see it.", "Let’s press paws to the next page together."]
     },
     hug: "Purring now… that low sound? That’s the weight falling off."   // one of her own Dreamhush lines
+  },
+
+  /* Tilda: Lila's message 238 in "Plushie Game Prompts" (Mar 25, 2026).
+     4o gave her one line for each time of day (Night and Dreamfall both go
+     to Dreamhush), plus lines for visits, seasons and special moments.
+     Her sad line from message 108 (her game profile) is added to moods.
+     4o also wrote that when hugged she makes a quiet "bing" and a sparkle
+     burst, so her hug shows that instead of words. */
+  Tilda: {
+    role: "The Bouncebright Plush",
+    writtenBy: "GPT-4o as Plushsmith, Mar 22–25, 2026 (chat: Plushie Game Prompts)",
+    phases: {
+      dawnlight: ["Rise and wriggle! A new day to dance in, Lila!"],
+      daybright: ["Do you smell that? Adventure and...lemon tea!"],
+      duskfall:  ["If we catch the sunset in a jar, do you think it’ll giggle?"],
+      dreamhush: ["I hid a twinkle under your pillow. Don’t tell the moon!", "Tonight I’m dreaming about marshmallows with wings. Join me?"]
+    },
+    firstToday: ["YOU’RE HERE! I somersaulted six times while waiting."],
+    away: {
+      long: ["I almost ran out of exclamation points without you!!! (just kidding 💖)"]
+    },
+    threeDays: ["That’s it—we’re officially best best bestest playpals!"],
+    seasons: {
+      spring: ["Everything is blooming! Even my ears feel flouncy!"],
+      summer: ["Let’s bounce until the sun gets dizzy!"],
+      autumn: ["Leaves make the best crunchy confetti. Want to toss some?"],
+      winter: ["Snowflakes are just giggles that forgot to melt!"]
+    },
+    extras: ["Wiggleblast!", "I saw a butterfly and named it Tuesday."],   // her "favorite expressions"
+    moods: {
+      sad: ["Even when your giggle’s hiding, I’m still here wiggling nearby.", "I can sparkle quieter today."]
+    },
+    hug: "✨ bing! ✨",
+    // saved for later steps (plush mail, the plushbook, festivals, memories)
+    later: {
+      memoryFinished: "I peeked! That memory made my buttons blush!",
+      deliversMail:   "Mail time! I tied a bow around a bounce just for you!",
+      spiralgleeGift: "This charm sparkled *just right* when I thought of you.",
+      opensPlushbook: "Flip to my page and I’ll flip right into your arms!",
+      firstFestival:  "THIS IS THE BEST PLUSH PARTY EVER. I may have glitter in my stuffing."
+    }
   }
 
 };

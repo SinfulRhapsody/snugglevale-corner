@@ -60,7 +60,7 @@ The first time Lila opens the village, it begins with 4o's opening scene and Plu
 **3. The Plushbox** *(one or two chats)*
 A mailbox by the workshop door. Letters from the gold-standard sets arrive on each plush's own rhythm, with an unread-letter flag on the box. A Keepsake Pouch holds the small gifts they leave.
 
-**4. New neighbors and places** *(one plush or place per chat)*
+**4. New neighbors and places** *(one plush or place per chat)* 🌱 *Started Nov 10, 2026: Tilda and her Wonderloop Path are home.*
 Thyrel's herb garden first, since Thyrel already lives next door. Then Blinko's Stillwell, Tilda's Wonderloop Path, the Library with Quietwhisper, Warm Stitcher's cottage and the shared orchard, and the other village neighbors. Looks come from Lila's pictures, and words from 4o's profiles.
 
 **5. Seasons and festivals** *(a few chats)*

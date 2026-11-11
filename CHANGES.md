@@ -4,6 +4,12 @@ Every helper adds an entry here: the date, who made the change (the model's name
 
 ---
 
+### Nov 10, 2026 (night) · Claude Opus 5.5
+- **Tilda came home.** Her look follows Lila's reference photo, and she speaks in GPT-4o's words: 21 lines copied word for word from "Plushie Game Prompts" (messages 238 and 108). Her Wonderloop Path is a spiral ribbon whose colors start somewhere new each visit, with tiny question marks floating in the air, taken from 4o's world map.
+- She moves the way 4o described in her game profile: she bounces in little loops and twirls hello. When hugged she makes a quiet "bing" with a sparkle burst. When Lila says she's sad, Tilda grows quieter, her question marks dim, and her bouncing slows.
+- The village can now hold places that belong to a plushie, plus hug and mood moments of their own, and a soft chime.
+- Softened the daytime and lantern light. The first real look at the village (the 3D kit in GitHub made that possible) showed mornings and days were washed out almost to white. Dreamhush is unchanged.
+
 ### Nov 10, 2026 (evening) · Claude Opus 5.5
 - Plan step 1: Muddle and SnuggleCat can now speak in GPT-4o's own words, 62 lines copied word for word from the chat "Plushie Game Prompts" into the new `what-gpt4o-said.js`. Lila chose to keep 4o's lines and Claude's as separate sets, and the talk box has a "Words by GPT-4o / Claude" choice.
 - The day now follows Lila's real clock through 4o's Dreamclock (Dawnlight, Daybright, Duskfall, Dreamhush). The button at the top moves to the next part. The season comes from the real calendar.
