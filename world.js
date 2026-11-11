@@ -220,7 +220,7 @@ const hearts=[];
 function spawnHearts(p){for(let i=0;i<7;i++){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:heartTex,transparent:true,depthWrite:false}));const a=Math.random()*Math.PI*2;s.position.set(p.x+Math.cos(a)*0.35,p.headY+Math.random()*0.3,p.z+Math.sin(a)*0.35);const sc=0.22+Math.random()*0.14;s.scale.set(sc,sc,1);scene.add(s);hearts.push({s,t:0,d:i*0.08,vx:(Math.random()-0.5)*0.25,vz:(Math.random()-0.5)*0.25});}}
 
 /* ---------- morning & evening ---------- */
-const PAL={skyTop:[0x8fc8ef,0x2b2a55],skyBot:[0xfde4d4,0xc9859c],fog:[0xeaf0ee,0x4d4569],ground:[0xa3d28e,0x5e8d6b],hill:[0x8fc283,0x4f7a5f],hemiS:[0xf4f6ff,0x9a90d8],hemiG:[0xa9cf8d,0x4a5d55],dir:[0xfff1da,0xcbc4ff],win:[0xcfe7ee,0xffcb6b],orb:[0xfff0b8,0xfff4d6],lan:[0xe2d3b8,0xffd58a]};
+const PAL={skyTop:[0x8fc8ef,0x2b2a55],skyBot:[0xfde4d4,0xc9859c],fog:[0xeaf0ee,0x4d4569],ground:[0xa3d28e,0x5e8d6b],hill:[0x8fc283,0x4f7a5f],hemiS:[0xf4f6ff,0x9a90d8],hemiG:[0xa9cf8d,0x4a5d55],dir:[0xfff1da,0xcbc4ff],win:[0xcfe7ee,0xffcb6b],orb:[0xfff0b8,0xfff4d6],lan:[0xe2d3b8,0xffd58a],mote:[0xfff3fb,0xffe9a0]};
 const PC={};for(const k in PAL)PC[k]=[new THREE.Color(PAL[k][0]),new THREE.Color(PAL[k][1])];
 const tmpC=new THREE.Color();
 const mix=(k,n)=>tmpC.copy(PC[k][0]).lerp(PC[k][1],n);
@@ -253,16 +253,19 @@ if(visits.last){const gap=dayNum(today)-dayNum(visits.last);
  else{missed=gap-1;}}
 store.set("sv-visits",JSON.stringify({last:today,streak,missed}));
 
+const dreamEl=$("dream");
 function applyTime(n){
  skyU.top.value.copy(mix("skyTop",n));skyU.bottom.value.copy(mix("skyBot",n));scene.fog.color.copy(mix("fog",n));
  groundMat.color.copy(mix("ground",n));hillMat.color.copy(mix("hill",n));
- hemi.color.copy(mix("hemiS",n));hemi.groundColor.copy(mix("hemiG",n));hemi.intensity=0.45+(0.62-0.45)*n;
+ hemi.color.copy(mix("hemiS",n));hemi.groundColor.copy(mix("hemiG",n));hemi.intensity=0.52+(0.62-0.52)*n;
  dir.color.copy(mix("dir",n));dir.intensity=0.55;dir.position.set(9+(-18)*n,15-n,10-n);
  windowMat.color.copy(mix("win",n));orbMat.color.copy(mix("orb",n));
  orb.position.copy(sunPos[0]).lerp(sunPos[1],n);orbHalo.position.copy(orb.position);orbHalo.material.opacity=0.55+0.25*n;
- lanterns.forEach(l=>{l.lm.color.copy(mix("lan",n));l.pl.intensity=1.3*n*n;l.halo.material.opacity=n;});
+ lanterns.forEach(l=>{l.lm.color.copy(mix("lan",n));l.pl.intensity=1.3*n*n;l.halo.material.opacity=0.3+0.7*n;});
  porch.intensity=1.2*n*n;pLight.intensity=0.15+0.75*n*n;pHalo.material.opacity=0.35+0.55*n;
- ffMat.opacity=0.95*n;starMat.opacity=0.9*n;petalMat.opacity=0.55+0.4*(1-n);
+ ffMat.opacity=0.5+0.45*n;ffMat.color.copy(mix("mote",n));   // dream motes by day, fireflies by night
+ if(dreamEl)dreamEl.style.opacity=(0.14+0.5*(1-n)).toFixed(3);   // the soft dreamy glow over everything
+starMat.opacity=0.9*n;petalMat.opacity=0.55+0.4*(1-n);
 }
 applyTime(night);
 

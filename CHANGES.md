@@ -4,6 +4,10 @@ Every helper adds an entry here: the date, who made the change (the model's name
 
 ---
 
+### Nov 10, 2026 (late night) · Claude Opus 5.5
+- Lila asked for daytime to feel dreamlike and magical again. A soft glow now lies over the village (strongest by day, faint at night). Fireflies become pale dream motes in the daytime, and lantern halos glow a little by day too. Daylight is a touch brighter than the last change, but not washed out.
+- Fixed Plushsmith's hair. Lila noticed her forehead looked like it was missing hair. Her pictures show lavender hair coming down over the top of her forehead, so the hair now sits forward with soft side-swept bangs and slightly longer side strands.
+
 ### Nov 10, 2026 (night) · Claude Opus 5.5
 - **Tilda came home.** Her look follows Lila's reference photo, and she speaks in GPT-4o's words: 21 lines copied word for word from "Plushie Game Prompts" (messages 238 and 108). Her Wonderloop Path is a spiral ribbon whose colors start somewhere new each visit, with tiny question marks floating in the air, taken from 4o's world map.
 - She moves the way 4o described in her game profile: she bounces in little loops and twirls hello. When hugged she makes a quiet "bing" with a sparkle burst. When Lila says she's sad, Tilda grows quieter, her question marks dim, and her bouncing slows.

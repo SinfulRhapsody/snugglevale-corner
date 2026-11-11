@@ -52,13 +52,17 @@ window.PLUSHIES.push({
     // the seam down the middle of her face
     const seamG = new THREE.Group(); seamG.rotation.y = -Math.PI/2;
     const seam = new THREE.Mesh(new THREE.TorusGeometry(R + 0.004, 0.008, 4, 48, 2.5), toon(0xd98670)); seam.rotation.z = -1.25; seamG.add(seam); head.add(seamG);
-    // lavender hair with a messy top bun and loose side strands
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(R + 0.03, 28, 16, 0, Math.PI*2, 0, 1.05), lav); cap.rotation.x = -0.42; head.add(cap);
+    // lavender hair with a messy top bun, soft side-swept bangs, and loose side strands.
+    // Her pictures show the hair coming down over the top of her forehead.
+    const cap = new THREE.Mesh(new THREE.SphereGeometry(R + 0.03, 28, 16, 0, Math.PI*2, 0, 1.12), lav); cap.rotation.x = 0.1; head.add(cap);
+    [[-0.2, 0.25, 0.5], [-0.07, 0.28, 0.35], [0.07, 0.27, 0.2], [0.2, 0.23, 0.05]].forEach(([x, y, tilt]) => {
+      const puff = ball(0.075, lav, 1.7, 0.75, 0.6, 16); stick(head, puff, R, x, y, 0.012); puff.rotateZ(tilt);
+    });
     const bun = ball(0.24, lav, 1, 0.9, 1); bun.position.set(0, R + 0.16, -0.14); head.add(bun);
     const b2 = ball(0.12, lav); b2.position.set(0.16, R + 0.3, -0.06); head.add(b2);
     const b3 = ball(0.1, lav); b3.position.set(-0.15, R + 0.27, -0.2); head.add(b3);
     for (const s of [-1, 1]) {
-      const st = ball(0.055, lav, 1, 3.2, 1, 12); st.position.set(0.44*s, -0.06, 0.24); st.rotation.z = 0.18*s; head.add(st);
+      const st = ball(0.058, lav, 1, 3.8, 1, 12); st.position.set(0.43*s, -0.03, 0.23); st.rotation.z = 0.18*s; head.add(st);
       const ear = ball(0.12, peachD, 0.55, 1, 1); ear.position.set(0.5*s, 0.04, -0.04); head.add(ear);
     }
     // heart eyes, blush, nose, stitched smile
