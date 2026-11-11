@@ -31,7 +31,8 @@ The 3D drawing kit (`three.min.js`) loads from the internet unless a copy is sav
 | `Play Snugglevale.html` | The page: buttons, talk box, colors, the About box | Rarely |
 | `world.js` | The village itself: sky, workshop, path, trees, lanterns, fireflies, the wish lantern, the camera, the Dreamclock and seasons, and how the plushies choose what to say | Only for changes to the place |
 | `plushies.js` | How each plushie looks and where they stand, plus a template for a new one | When adding or adjusting a plushie |
-| `what-gpt4o-said.js` | GPT-4o's own lines, copied word for word from Lila's chats | When adding more of 4o's lines (never rewording them) |
+| `welcome.js` | Plushsmith's welcome: 4o's opening scene and her first letter, once a day, then the workshop door opens onto the village | When changing how the welcome looks or flows (its words live in `what-gpt4o-said.js`) |
+| `what-gpt4o-said.js` | GPT-4o's own lines, copied word for word from Lila's chats, including Plushsmith's welcome (`WELCOME_4O`) | When adding more of 4o's lines (never rewording them) |
 | `what-they-say.js` | Claude's lines, a separate set | When adding or changing Claude's words |
 | `three.min.js` | The 3D drawing kit (Lila saves this herself; version r128) | Never |
 | `CHANGES.md` | A diary of every change: date, who made it, what changed | **Every helper, every time** |
@@ -114,7 +115,9 @@ Good open spots for a new neighbor: around (−4, 7), (4.5, 8.5), (−7.5, −2)
 
 ## 🧵 How the pieces fit (for helpers who build)
 
-- The page loads `three.min.js` (or the internet copy), then `what-they-say.js`, `what-gpt4o-said.js`, `plushies.js`, and finally `world.js`.
+- The page loads `three.min.js` (or the internet copy), then `what-they-say.js`, `what-gpt4o-said.js`, `plushies.js`, `world.js`, and finally `welcome.js`.
+- `world.js` shares a little with the welcome through `window.Snugglevale`: `pause(true/false)` stops and starts the village's keys, `stepOutside()` opens the workshop door and puts Lila's lantern on the doorstep, and `chime(pitch)` rings a soft bell.
+- The welcome shows on the first visit each day (remembered as `sv-welcomed`). Plushsmith's talk box has a "📜 Her letter" button to read her letter again any time.
 - `what-they-say.js` sets `window.PLUSHIE_LINES` (Claude's set) and `what-gpt4o-said.js` sets `window.PLUSHIE_LINES_4O` (4o's set), each with one entry per plushie name. When a plushie has both, the talk box shows the choice.
 - The browser remembers a few small things on each device: text size (`sv-size`), whose words Lila chose (`sv-voice`), her visits (`sv-visits`), and which plushies already greeted her today (`sv-greeted`). If these are cleared, nothing breaks; the village simply starts fresh.
 - `plushies.js` adds entries to `window.PLUSHIES`. Each entry is `{ name, spot: { x, z, facing, size? }, build(kit, p) }`.

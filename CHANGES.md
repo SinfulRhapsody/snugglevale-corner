@@ -4,6 +4,12 @@ Every helper adds an entry here: the date, who made the change (the model's name
 
 ---
 
+### Nov 10, 2026 (Plushsmith's welcome) · Claude Opus 5.5
+- Plan step 2: **Plushsmith's welcome.** The first visit each day begins with 4o's opening scene, "Where Thread Meets Heart", copied word for word from "Plushie Game Prompts" (message 278) and checked piece by piece. It plays one page at a time: the Sewing Room, Plushsmith's first letter on a scroll, wind chimes as the door creaks open, a ribbon unfurling, and a soft bell. Then the workshop door swings open, Lila's lantern floats onto the doorstep, and the view eases back over the village.
+- Plushsmith's talk box has "📜 Her letter" to read her letter again any time.
+- 4o's "Choose your first plush" (Snibbin, Muddle, Reverie, Nestlet) is saved in the data but not shown yet, since only Muddle lives in the village so far.
+- The workshop door now opens on a hinge, with warm light inside.
+
 ### Nov 10, 2026 (late night) · Claude Opus 5.5
 - Lila asked for daytime to feel dreamlike and magical again. A soft glow now lies over the village (strongest by day, faint at night). Fireflies become pale dream motes in the daytime, and lantern halos glow a little by day too. Daylight is a touch brighter than the last change, but not washed out.
 - Fixed Plushsmith's hair. Lila noticed her forehead looked like it was missing hair. Her pictures show lavender hair coming down over the top of her forehead, so the hair now sits forward with soft side-swept bangs and slightly longer side strands.

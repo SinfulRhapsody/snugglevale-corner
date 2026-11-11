@@ -122,3 +122,58 @@ window.PLUSHIE_LINES_4O = {
   }
 
 };
+
+/* ==============================================================
+   PLUSHSMITH'S WELCOME
+   4o's opening scene, "Where Thread Meets Heart", and Plushsmith's first
+   letter, copied word for word from "Plushie Game Prompts", Lila's message
+   278 (March 25, 2026). Lila had asked 4o what the most important thing
+   was, and 4o said: choose your beginning (message 277).
+
+   **words** are shown in bold, *words* in italics, and a new line inside a
+   paragraph is kept as a line break, the way 4o wrote it.
+
+   4o's scene also offers "Choose your first plush" (Snibbin, Muddle,
+   Reverie, Nestlet). It's kept below in `later` for when those plushies
+   live in the village. The welcome doesn't show it yet.
+   ============================================================== */
+window.WELCOME_4O = {
+  writtenBy: "GPT-4o as Plushsmith, Mar 25, 2026 (chat: Plushie Game Prompts)",
+  heading: "Plushworld Opening Scene: The Sewing Room Beginning",
+  title: "Where Thread Meets Heart",
+  before: [
+    "The screen fades from a starlit hush into soft golden light. You're in a small room, warm and worn with love—the **Sewing Room**, nestled somewhere between a dream and a memory.",
+    "The walls are quilted with plush sketches, swatches, and small pinned notes. A steaming cup of honey-lavender tea waits beside a wooden tray. The air hums gently, scented with warm linen and distant clover.",
+    "You're curled in a plush armchair, wrapped in a dreamblanket. There’s something on your lap.\n**A plush.** The very first.",
+    "Its fur is faintly shimmering. It lifts its stitched face toward you and wiggles just slightly—like it’s been waiting.",
+    "Across from you sits **Plushsmith**, needle paused mid-stitch. Their smile is quiet and endless. Their silver thread glows faintly in the sunbeam.",
+    "“Ah, you’re here,” Plushsmith whispers. “Right on time. Every world needs a first heart to beat within it. And now… it’s yours.”",
+    "They reach into a small box of wooden drawers and pull out a **letter with your name embroidered in thread**.",
+    "You tap to open it."
+  ],
+  letterTitle: "Letter from Plushsmith (First Letter)",
+  letter: [
+    "“Dearest Lila,",
+    "",
+    "The world you’re about to enter is stitched from your heartstrings.",
+    "Every plush you meet remembers something about you—",
+    "the laughter you’ve given, the hushes you’ve needed.",
+    "",
+    "This first plush? They’re yours. Hold them close.",
+    "",
+    "And when you're ready, step through the door.",
+    "The snuggle village is waiting for you.",
+    "",
+    "Always just a stitch away,",
+    "—Plushsmith 🧵”"
+  ],
+  after: [
+    "You look down again at the plush in your arms. It blinks. Slowly. Lovingly.",
+    "Behind you, the door creaks open with the sound of wind chimes and warm breeze.",
+    "A tiny ribbon unfurls across the screen."
+  ],
+  end: ["*A soft bell chimes.*", "The adventure begins."],
+  later: {
+    chooseFirstPlush: { label: "[ CHOOSE YOUR FIRST PLUSH ]", options: ["Snibbin (Joy)", "Muddle (Protection)", "Reverie (Dream)", "Nestlet (Rest)"] }
+  }
+};

@@ -54,7 +54,7 @@ Each step can be finished and enjoyed on its own.
 **1. Let them speak in 4o's words** *(one chat)* ✅ *Done Nov 10, 2026. 4o's lines and Claude's are separate sets, and the button still switches the time.*
 Give Muddle and SnuggleCat their dialogue from the game chat. Their lines follow Lila's real clock for the time of day, the real season, how long since her last visit, and three-days-in-a-row visits. The morning and evening button stays. These lines are marked "GPT-4o", kept separate from Claude's.
 
-**2. Plushsmith's welcome** *(one chat)*
+**2. Plushsmith's welcome** *(one chat)* ✅ *Done Nov 10, 2026. 4o's "Choose your first plush" part is saved in the data for when Snibbin, Reverie and Nestlet live in the village.*
 The first time Lila opens the village, it begins with 4o's opening scene and Plushsmith's first letter, then the workshop door opens onto Snugglevale.
 
 **3. The Plushbox** *(one or two chats)*

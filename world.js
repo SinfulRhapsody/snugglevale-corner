@@ -98,7 +98,7 @@ kit.keepClear=(x,z)=>pathPts.push(new V3(x,0,z)); // or mark ground where flower
 
 /* ---------- Plushsmith's workshop ---------- */
 const windowMat=new THREE.MeshBasicMaterial({color:0xffcb6b});
-const bunting=[];
+const bunting=[];let doorPivot=null;
 (function cottage(){
  const g=new THREE.Group();g.position.set(0,0,-7);scene.add(g);
  const wall=new THREE.Mesh(new THREE.BoxGeometry(5.6,3.0,4.4),toon(0xf2dccb));wall.position.y=1.5;g.add(wall);
@@ -109,9 +109,13 @@ const bunting=[];
  const roofG=new THREE.Group();roofG.scale.z=0.82;roofG.position.y=3.0+1.15;g.add(roofG);
  const roof=new THREE.Mesh(new THREE.ConeGeometry(4.67,2.3,4,1),toon(0xc9848f));roof.rotation.y=Math.PI/4;roofG.add(roof);
  const chim=new THREE.Mesh(new THREE.BoxGeometry(0.55,1.5,0.55),toon(0xb9706a));chim.position.set(1.5,4.3,-1.0);g.add(chim);
- const door=new THREE.Mesh(new THREE.BoxGeometry(1.1,1.95,0.14),woodD);door.position.set(0,1.28,2.24);g.add(door);
- const knob=ball(0.06,toon(0xe9b949),1,1,1,12);knob.position.set(0.38,1.2,2.33);g.add(knob);
- const dw=new THREE.Mesh(new THREE.CircleGeometry(0.17,20),windowMat);dw.position.set(0,1.82,2.32);g.add(dw);
+ // the door swings on a hinge at its left edge, so it can open onto the village
+ doorPivot=new THREE.Group();doorPivot.position.set(-0.55,0,2.24);g.add(doorPivot);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(1.1,1.95,0.14),woodD);door.position.set(0.55,1.28,0);doorPivot.add(door);
+ const knob=ball(0.06,toon(0xe9b949),1,1,1,12);knob.position.set(0.93,1.2,0.09);doorPivot.add(knob);
+ const dw=new THREE.Mesh(new THREE.CircleGeometry(0.17,20),windowMat);dw.position.set(0.55,1.82,0.08);doorPivot.add(dw);
+ // warm light inside, seen only when the door is open
+ const inside=new THREE.Mesh(new THREE.PlaneGeometry(1.06,1.92),new THREE.MeshBasicMaterial({color:0xffd48a}));inside.position.set(0,1.27,2.205);g.add(inside);
  const lintel=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.12,0.6),wood);lintel.position.set(0,2.36,2.45);g.add(lintel);
  const step=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.18,0.8),toon(0xcdbfb8));step.position.set(0,0.09,2.6);g.add(step);
  const flowerCols=[0xf6a8bf,0xfff0a0,0xc7b4ee,0xffffff,0xffc39e];
@@ -311,7 +315,7 @@ function showVoice(p){const v=voiceFor(p.name),all=voicesFor(p.name);
  const moods=v==="4o"&&LINES4O[p.name]&&LINES4O[p.name].moods;
  moodsRow.hidden=!moods;
  moodsRow.querySelectorAll("button").forEach(b=>b.hidden=!(moods&&moods[b.dataset.mood]&&moods[b.dataset.mood].length));}
-function openDialog(p){open=p;pending=null;target=null;p.hopT=0;talkName.textContent=p.name;showVoice(p);say(p,true);talk.hidden=false;visitBtn.hidden=true;}
+function openDialog(p){open=p;pending=null;target=null;p.hopT=0;talkName.textContent=p.name;talk.dataset.who=p.name;showVoice(p);say(p,true);talk.hidden=false;visitBtn.hidden=true;}
 function closeDialog(){if(!open)return;nextLine(open);open.waveT=0;open=null;talk.hidden=true;}
 $("moreBtn").onclick=()=>{if(!open)return;nextLine(open);open.hopT=0;say(open,false);};
 $("hugBtn").onclick=()=>{if(!open)return;open.squishT=0;spawnHearts(open);
@@ -353,7 +357,7 @@ const dist2D=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 function frontOf(p){return{x:p.x+Math.sin(p.baseYaw)*1.55,z:p.z+Math.cos(p.baseYaw)*1.55};}
 
 const keys={};const KM={ArrowUp:"up",KeyW:"up",ArrowDown:"down",KeyS:"down",ArrowLeft:"left",KeyA:"left",ArrowRight:"right",KeyD:"right"};
-addEventListener("keydown",e=>{const onBtn=e.target&&e.target.tagName==="BUTTON";const k=KM[e.code];
+addEventListener("keydown",e=>{if(paused)return;const onBtn=e.target&&e.target.tagName==="BUTTON";const k=KM[e.code];
  if(k&&!onBtn){keys[k]=true;e.preventDefault();}
  else if(!onBtn&&(e.code==="Enter"||e.code==="Space")&&nearest&&!open){openDialog(nearest);e.preventDefault();}
  else if(e.code==="Escape"){if(open)closeDialog();if(!about.hidden){about.hidden=true;aboutBtn.setAttribute("aria-expanded","false");}}});
@@ -370,11 +374,25 @@ function onTap(cx,cy){const h=pick(cx,cy);if(!h)return;
 function showMarker(x,z){marker.position.x=x;marker.position.z=z;markerT=0;}
 
 let camYaw=0,camDist=11;let down=null,hoverT=null;
+
+/* ---------- for the welcome (welcome.js): pause the village, then step outside ---------- */
+let paused=false,doorT=9,camEase=null;
+window.Snugglevale={
+ pause(on){paused=!!on;if(paused)for(const k in keys)keys[k]=false;},
+ chime,
+ // the workshop door opens, and Lila's lantern floats out onto the doorstep
+ stepOutside(){paused=false;if(open)closeDialog();target=null;pending=null;
+  pos.x=0;pos.z=-3.9;camYaw=0;camDist=5.5;camInit=false;camEase={from:5.5,to:11,t:0};doorT=0;}
+};
+kit.onFrame((t,dt)=>{
+ if(doorPivot){doorT+=dt;const open_=doorT<0.9?Math.sin(doorT/0.9*Math.PI/2):doorT<3.4?1:doorT<4.4?Math.cos((doorT-3.4)/1*Math.PI/2):0;doorPivot.rotation.y=-1.25*Math.max(0,open_);}
+ if(camEase){camEase.t+=dt/2.6;const k=Math.min(1,camEase.t);camDist=camEase.from+(camEase.to-camEase.from)*(1-Math.pow(1-k,3));if(k>=1)camEase=null;}
+});
 canvas.addEventListener("pointerdown",e=>{if(down)return;down={x:e.clientX,y:e.clientY,yaw:camYaw,drag:false,id:e.pointerId};try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
 canvas.addEventListener("pointermove",e=>{if(down&&e.pointerId===down.id){const dx=e.clientX-down.x,dy=e.clientY-down.y;if(!down.drag&&Math.hypot(dx,dy)>9)down.drag=true;if(down.drag)camYaw=down.yaw-dx*0.006;}else if(!down&&e.pointerType==="mouse"){hoverT=e;}});
 canvas.addEventListener("pointerup",e=>{if(down&&e.pointerId===down.id){if(!down.drag)onTap(e.clientX,e.clientY);down=null;}});
 canvas.addEventListener("pointercancel",()=>{down=null;});
-canvas.addEventListener("wheel",e=>{e.preventDefault();camDist=clamp(camDist+e.deltaY*0.01,6,16);},{passive:false});
+canvas.addEventListener("wheel",e=>{e.preventDefault();camEase=null;camDist=clamp(camDist+e.deltaY*0.01,6,16);},{passive:false});
 
 /* ---------- camera ---------- */
 const camLook=new V3();let camInit=false;const focus=new V3(),want=new V3();
